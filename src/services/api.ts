@@ -56,11 +56,26 @@ api.interceptors.response.use(
 );
 
 // List all documents
-export const listDocuments = async () => {
-  const response = await fetch(`${API_BASE_URL}/documents`, {
+export const listDocuments = async (userId?: string) => {
+  const user_id = userId || 'garrett_test'; // Fallback to default if no user ID provided
+  
+  console.log('Attempting to fetch documents with:', {
+    url: `${API_BASE_URL}/documents?user_id=${user_id}`,
     headers: { 'X-API-Key': API_KEY }
   });
-  if (!response.ok) throw new Error('Failed to fetch documents');
+  
+  const response = await fetch(`${API_BASE_URL}/documents?user_id=${user_id}`, {
+    headers: { 'X-API-Key': API_KEY }
+  });
+  
+  console.log('Documents response status:', response.status, response.statusText);
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Documents API error response:', errorText);
+    throw new Error(`Failed to fetch documents: ${response.status} ${response.statusText}`);
+  }
+  
   const data = await response.json();
   console.log('Documents API response:', data);
   return data;
@@ -91,9 +106,13 @@ export const askQuestion = async (payload: { question: string, document_ids: str
 };
 
 // Upload a document
-export const uploadDocument = async (file: File) => {
+export const uploadDocument = async (file: File, userId?: string) => {
+  const user_id = userId || 'garrett_test'; // Fallback to default if no user ID provided
+  
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('user_id', user_id);
+  
   const response = await fetch(`${API_BASE_URL}/upload`, {
     method: 'POST',
     headers: { 'X-API-Key': API_KEY },
@@ -114,19 +133,13 @@ export const getStatus = async (jobId: string) => {
 
 // Project Management APIs
 export const createProject = async (payload: { name: string, file_ids?: string[] }) => {
-  // Add user_id to the payload
-  const fullPayload = {
-    ...payload,
-    user_id: 'garrett_test' // Use the same user ID as other endpoints
-  };
-  
   const response = await fetch(`${API_BASE_URL}/projects`, {
     method: 'POST',
     headers: {
       'X-API-Key': API_KEY,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(fullPayload)
+    body: JSON.stringify({ name: payload.name })
   });
   if (!response.ok) throw new Error('Failed to create project');
   const data = await response.json();
@@ -142,10 +155,16 @@ export const createProject = async (payload: { name: string, file_ids?: string[]
 };
 
 export const listProjects = async () => {
-  const response = await fetch(`${API_BASE_URL}/projects?user_id=garrett_test`, {
+  // Use GET endpoint for listing projects
+  const response = await fetch(`${API_BASE_URL}/user/garrett/projects`, {
     headers: { 'X-API-Key': API_KEY }
   });
-  if (!response.ok) throw new Error('Failed to fetch projects');
+  
+  if (!response.ok) {
+    console.warn(`Projects API failed: ${response.status} ${response.statusText}`);
+    return [];
+  }
+  
   const data = await response.json();
   console.log('Projects API response:', data);
   
@@ -210,6 +229,35 @@ export const removeFilesFromProject = async (projectId: string, fileIds: string[
   });
   if (!response.ok) throw new Error('Failed to remove files from project');
   return response.json();
+};
+
+// Test API connectivity
+export const testApiConnection = async () => {
+  console.log('Testing API connection...');
+  console.log('API Base URL:', API_BASE_URL);
+  console.log('API Key:', API_KEY ? `${API_KEY.substring(0, 10)}...` : 'Not set');
+  
+  try {
+    // Test basic connectivity
+    const response = await fetch(`${API_BASE_URL}/docs`);
+    console.log('API docs endpoint status:', response.status);
+    
+    // Test with auth
+    const authTest = await fetch(`${API_BASE_URL}/documents?user_id=garrett_test`, {
+      headers: { 'X-API-Key': API_KEY }
+    });
+    console.log('Auth test status:', authTest.status);
+    
+    if (!authTest.ok) {
+      const errorText = await authTest.text();
+      console.error('Auth test error:', errorText);
+    }
+    
+    return { docsStatus: response.status, authStatus: authTest.status };
+  } catch (error) {
+    console.error('API connection test failed:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error' };
+  }
 };
 
 export default api; 

@@ -137,7 +137,8 @@ VITE_API_KEY=bl_garrett_dev_67890
 ## 🎨 Design System
 
 ### Colors
-- **Primary**: Blue (#0ea5e9) - Used for buttons, links, and highlights
+- **Primary**: Black (#000000) in dark mode, White (#ffffff) in light mode
+- **Accent**: Gray (#262626) and Light Gray (#a6a6a6) - Used for secondary elements
 - **Success**: Green (#10b981) - Used for completed status
 - **Warning**: Yellow (#f59e0b) - Used for processing status
 - **Error**: Red (#ef4444) - Used for errors and failed status
@@ -156,26 +157,39 @@ The frontend integrates with the following API endpoints:
 ```typescript
 POST /upload
 Content-Type: multipart/form-data
-Authorization: Bearer {API_KEY}
+Headers: { "X-API-Key": "bl_garrett_dev_67890" }
 ```
 
 ### Check Processing Status
 ```typescript
 GET /status/{job_id}
-Authorization: Bearer {API_KEY}
+Headers: { "X-API-Key": "bl_garrett_dev_67890" }
 ```
 
 ### Ask Questions
 ```typescript
 POST /ask
 Content-Type: application/json
-Authorization: Bearer {API_KEY}
+Headers: { "X-API-Key": "bl_garrett_dev_67890" }
 ```
 
 ### List Documents
 ```typescript
-GET /documents/{user_id}
-Authorization: Bearer {API_KEY}
+GET /documents?user_id=garrett_test
+Headers: { "X-API-Key": "bl_garrett_dev_67890" }
+```
+
+### List Projects
+```typescript
+GET /user/garrett/projects
+Headers: { "X-API-Key": "bl_garrett_dev_67890" }
+```
+
+### Create Project
+```typescript
+POST /projects
+Headers: { "X-API-Key": "bl_garrett_dev_67890" }
+Body: { "name": "Project Name" }
 ```
 
 ## 🚀 Deployment

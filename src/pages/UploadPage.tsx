@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import { uploadDocument } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 const UploadPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +41,7 @@ const UploadPage = () => {
         const file = selectedFiles[i];
         // Simulate progress
         setUploadProgress((prev) => prev.map((p, idx) => (idx === i ? 10 : p)));
-        const res = await uploadDocument(file);
+        const res = await uploadDocument(file, user?.id);
         setUploadProgress((prev) => prev.map((p, idx) => (idx === i ? 100 : p)));
       }
       setSuccess(true);
@@ -80,16 +82,16 @@ const UploadPage = () => {
           className={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
             ${isDragActive 
-              ? 'border-primary-400 bg-primary-50 dark:bg-primary-900/20' 
-              : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'
+                      ? 'border-gray-400 bg-gray-50 dark:bg-gray-900/20'
+        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
             }
             ${uploading ? 'pointer-events-none opacity-50' : ''}
           `}
         >
           <input {...getInputProps()} multiple />
           <div className="space-y-4">
-            <div className="mx-auto w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
-              <Upload className="h-8 w-8 text-primary-600" />
+                    <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-900/30 rounded-full flex items-center justify-center">
+          <Upload className="h-8 w-8 text-gray-600 dark:text-gray-400" />
             </div>
             <div>
               <p className="text-lg font-medium text-gray-900 dark:text-white">
@@ -119,7 +121,7 @@ const UploadPage = () => {
                     {uploading ? (
                       <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                         <div 
-                          className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-gray-900 dark:bg-white h-2 rounded-full transition-all duration-300"
                           style={{ width: `${uploadProgress[idx] || 0}%` }}
                         ></div>
                       </div>
@@ -177,7 +179,7 @@ const UploadPage = () => {
       <div className="mt-8 text-center">
         <button
           onClick={() => navigate('/documents')}
-          className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+                      className="text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-gray-300 font-medium"
         >
           View Document Library →
         </button>

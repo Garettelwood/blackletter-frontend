@@ -13,15 +13,17 @@ import {
 } from 'lucide-react';
 import { listDocuments, deleteDocument } from '../services/api';
 import { Document } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 const DocumentLibrary = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'completed' | 'processing' | 'failed'>('all');
 
   const { data: documents = [], isLoading, error, refetch } = useQuery(
     'documents',
-    () => listDocuments('garrett_test'),
+    () => listDocuments(user?.id),
     {
       refetchInterval: 10000, // Refetch every 10 seconds to update status
     }
@@ -75,7 +77,7 @@ const DocumentLibrary = () => {
     return (
       <div className="max-w-6xl mx-auto">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading documents...</p>
         </div>
       </div>
@@ -182,7 +184,7 @@ const DocumentLibrary = () => {
             <div key={doc.document_id} className="card p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
-                  <FileText className="h-8 w-8 text-primary-600 mr-3" />
+                  <FileText className="h-8 w-8 text-gray-600 dark:text-gray-400 mr-3" />
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white truncate max-w-48">
                       {doc.filename}

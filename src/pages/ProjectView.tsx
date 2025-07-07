@@ -107,7 +107,7 @@ const ProjectView = () => {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-600 border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-900 dark:border-white border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading project...</p>
         </div>
       </div>
@@ -127,7 +127,7 @@ const ProjectView = () => {
           </p>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+            className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100"
           >
             Go Home
           </button>
@@ -148,7 +148,7 @@ const ProjectView = () => {
           </p>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+            className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100"
           >
             Go Home
           </button>
@@ -253,7 +253,7 @@ const ProjectView = () => {
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowAddFiles(!showAddFiles)}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 flex items-center space-x-2"
+              className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 flex items-center space-x-2"
             >
               <Plus className="h-4 w-4" />
               <span>Add Files</span>
@@ -299,7 +299,7 @@ const ProjectView = () => {
                           setSelectedFiles(prev => prev.filter(id => id !== doc.document_id));
                         }
                       }}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      className="rounded border-gray-300 text-gray-600 dark:text-gray-400 focus:ring-gray-500"
                     />
                     <FileText className="h-4 w-4 text-gray-400" />
                     <div className="flex-1">
@@ -317,7 +317,7 @@ const ProjectView = () => {
                   <button
                     onClick={handleAddFiles}
                     disabled={selectedFiles.length === 0 || addFilesToProjectMutation.isLoading}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                    className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50"
                   >
                     {addFilesToProjectMutation.isLoading ? 'Adding...' : `Add ${selectedFiles.length} Files`}
                   </button>
@@ -353,7 +353,7 @@ const ProjectView = () => {
               </p>
               <button
                 onClick={() => setShowAddFiles(true)}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                                    className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100"
               >
                 Add Files
               </button>
@@ -391,7 +391,7 @@ const ProjectView = () => {
                     {file.status === 'completed' && (
                       <button
                         onClick={() => navigate(`/chat/${file.document_id}`)}
-                        className="w-full mt-3 px-3 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 flex items-center justify-center space-x-2"
+                        className="w-full mt-3 px-3 py-2 bg-gray-900 dark:bg-white text-white dark:text-black text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 flex items-center justify-center space-x-2"
                       >
                         <MessageSquare className="h-4 w-4" />
                         <span>Ask Questions</span>

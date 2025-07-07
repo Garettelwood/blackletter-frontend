@@ -142,7 +142,7 @@ const NewProjectModal = ({ isOpen, onClose }: NewProjectModalProps) => {
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               placeholder="Enter project name..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               disabled={createProjectMutation.isLoading}
             />
           </div>
@@ -156,7 +156,7 @@ const NewProjectModal = ({ isOpen, onClose }: NewProjectModalProps) => {
               {filteredDocuments.length > 0 && (
                 <button
                   onClick={handleSelectAll}
-                  className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                  className="text-sm text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-gray-300"
                 >
                   {selectedFiles.length === filteredDocuments.length ? 'Deselect All' : 'Select All'}
                 </button>
@@ -170,7 +170,7 @@ const NewProjectModal = ({ isOpen, onClose }: NewProjectModalProps) => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search files..."
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 disabled={createProjectMutation.isLoading}
               />
             </div>
@@ -201,7 +201,7 @@ const NewProjectModal = ({ isOpen, onClose }: NewProjectModalProps) => {
                         checked={selectedFiles.includes(doc.document_id)}
                         onChange={() => handleFileToggle(doc.document_id)}
                         disabled={createProjectMutation.isLoading}
-                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        className="rounded border-gray-300 text-gray-600 dark:text-gray-400 focus:ring-gray-500"
                       />
                       <FileText className="h-4 w-4 text-gray-400" />
                       <div className="flex-1 min-w-0">
@@ -213,7 +213,7 @@ const NewProjectModal = ({ isOpen, onClose }: NewProjectModalProps) => {
                         </p>
                       </div>
                       {selectedFiles.includes(doc.document_id) && (
-                        <Check className="h-4 w-4 text-primary-600" />
+                        <Check className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                       )}
                     </label>
                   ))}
@@ -239,7 +239,7 @@ const NewProjectModal = ({ isOpen, onClose }: NewProjectModalProps) => {
             <button
               onClick={handleCreateProject}
               disabled={!projectName.trim() || createProjectMutation.isLoading}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {createProjectMutation.isLoading ? (
                 <>

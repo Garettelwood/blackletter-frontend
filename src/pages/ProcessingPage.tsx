@@ -38,7 +38,7 @@ const ProcessingPage = () => {
   }, [jobId]); // Only run when jobId changes
 
   const getStatusIcon = () => {
-    if (!status) return <Loader2 className="h-8 w-8 text-primary-600 animate-spin" />;
+    if (!status) return <Loader2 className="h-8 w-8 text-gray-900 dark:text-white animate-spin" />;
     
     switch (status) {
       case 'completed':
@@ -46,7 +46,7 @@ const ProcessingPage = () => {
       case 'failed':
         return <AlertCircle className="h-8 w-8 text-red-600" />;
       default:
-        return <Loader2 className="h-8 w-8 text-primary-600 animate-spin" />;
+        return <Loader2 className="h-8 w-8 text-gray-900 dark:text-white animate-spin" />;
     }
   };
 
@@ -135,7 +135,7 @@ const ProcessingPage = () => {
           <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={() => navigate('/documents')}
-              className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+              className="text-gray-900 hover:text-gray-700 dark:text-white dark:hover:text-gray-300 font-medium"
             >
               View Document Library
             </button>

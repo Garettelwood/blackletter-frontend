@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { 
@@ -13,7 +13,8 @@ import {
   ChevronRight,
   MoreVertical,
   Trash2,
-  FileText
+  FileText,
+  LogOut
 } from 'lucide-react';
 import { Project, Document } from '../types';
 import { 
@@ -24,6 +25,7 @@ import {
   addFilesToProject,
   listDocuments 
 } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import NewProjectModal from './NewProjectModal';
 
 interface SidebarProps {
@@ -35,6 +37,7 @@ const Sidebar = ({ darkMode, setDarkMode }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
+  const { user, logout } = useAuth();
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
@@ -44,10 +47,18 @@ const Sidebar = ({ darkMode, setDarkMode }: SidebarProps) => {
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [newProjectName, setNewProjectName] = useState('');
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const settingsMenuRef = useRef<HTMLDivElement>(null);
 
   // Fetch projects and documents
   const { data: projectsData, isLoading: projectsLoading, error: projectsError } = useQuery('projects', listProjects);
-  const { data: documentsData, isLoading: documentsLoading, error: documentsError } = useQuery('documents', listDocuments);
+  const { data: documentsData, isLoading: documentsLoading, error: documentsError } = useQuery(
+    ['documents', user?.id],
+    () => listDocuments(user?.id),
+    {
+      enabled: !!user?.id
+    }
+  );
   
   // Ensure we have arrays, even if API returns different structure
   const projects = Array.isArray(projectsData) ? projectsData : [];
@@ -139,38 +150,58 @@ const Sidebar = ({ darkMode, setDarkMode }: SidebarProps) => {
     });
   };
 
+  // Close settings menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (settingsMenuRef.current && !settingsMenuRef.current.contains(event.target as Node)) {
+        setShowSettingsMenu(false);
+      }
+    };
+
+    if (showSettingsMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSettingsMenu]);
+
   return (
-    <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+    <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
       {/* Blackletter Branding */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="p-8 border-b border-gray-200 dark:border-gray-800">
+        <h1 className="text-3xl font-bold text-gray-950 dark:text-white font-serif">
           Blackletter
         </h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 font-serif">
+          Legal AI Assistant
+        </p>
       </div>
 
       {/* Navigation Buttons */}
-      <div className="p-4 space-y-2">
+      <div className="p-6 space-y-3">
         <button
           onClick={() => setShowNewProjectModal(true)}
-          className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          className="w-full flex items-center space-x-4 px-6 py-4 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group"
         >
-          <Plus className="h-5 w-5" />
+          <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
           <span className="font-medium">New Project</span>
         </button>
         
         <button
           onClick={() => navigate('/upload')}
-          className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          className="w-full flex items-center space-x-4 px-6 py-4 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group"
         >
-          <FileText className="h-5 w-5" />
+          <FileText className="h-5 w-5 group-hover:scale-110 transition-transform" />
           <span className="font-medium">Upload Files</span>
         </button>
         
         <button
           onClick={() => setShowAllFiles(!showAllFiles)}
-          className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          className="w-full flex items-center space-x-4 px-6 py-4 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group"
         >
-          <FolderOpen className="h-5 w-5" />
+          <FolderOpen className="h-5 w-5 group-hover:scale-110 transition-transform" />
           <span className="font-medium">View All Files</span>
         </button>
       </div>
@@ -208,7 +239,7 @@ const Sidebar = ({ darkMode, setDarkMode }: SidebarProps) => {
                       type="checkbox"
                       checked={selectedFiles.includes(doc.document_id)}
                       onChange={() => handleFileSelection(doc.document_id)}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      className="rounded border-gray-300 text-gray-600 dark:text-gray-400 focus:ring-gray-500"
                     />
                     <span className="truncate">{doc.filename}</span>
                   </label>
@@ -228,7 +259,7 @@ const Sidebar = ({ darkMode, setDarkMode }: SidebarProps) => {
                 <button
                   onClick={handleCreateProjectFromFiles}
                   disabled={!newProjectName.trim() || createProjectMutation.isLoading}
-                  className="w-full px-3 py-1 text-xs bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-1 text-xs bg-gray-900 dark:bg-white text-white dark:text-black rounded hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {createProjectMutation.isLoading ? 'Creating...' : `Create Project (${selectedFiles.length} files)`}
                 </button>
@@ -287,7 +318,7 @@ const Sidebar = ({ darkMode, setDarkMode }: SidebarProps) => {
                   />
                 ) : (
                   <span 
-                    className="text-sm font-medium cursor-pointer hover:text-primary-600 dark:hover:text-primary-400"
+                    className="text-sm font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/projects/${project.id}`);
@@ -374,32 +405,70 @@ const Sidebar = ({ darkMode, setDarkMode }: SidebarProps) => {
         )}
       </div>
 
-      {/* Bottom Actions */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-        >
-          {darkMode ? (
-            <Sun className="h-5 w-5" />
-          ) : (
-            <Moon className="h-5 w-5" />
-          )}
-          <span className="font-medium">
-            {darkMode ? 'Light Mode' : 'Dark Mode'}
-          </span>
-        </button>
-        
-        <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-          <User className="h-5 w-5" />
-          <span className="font-medium">Profile</span>
-        </button>
-        
-        <button className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-          <Settings className="h-5 w-5" />
-          <span className="font-medium">Settings</span>
-        </button>
-      </div>
+      {/* Bottom User Section */}
+      {user && (
+        <div className="mt-auto p-6 border-t border-gray-200 dark:border-gray-800">
+          <div className="flex items-center justify-between">
+            {/* User Profile */}
+            <div className="flex items-center space-x-3 flex-1 min-w-0">
+              <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                <User className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {user.username}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+            
+            {/* Settings Button */}
+            <div className="relative" ref={settingsMenuRef}>
+              <button
+                onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+              >
+                <Settings className="h-5 w-5" />
+              </button>
+              
+              {/* Settings Dropdown */}
+              {showSettingsMenu && (
+                <div className="absolute bottom-full right-0 mb-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
+                  <button
+                    onClick={() => {
+                      setDarkMode(!darkMode);
+                      setShowSettingsMenu(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors"
+                  >
+                    {darkMode ? (
+                      <Sun className="h-4 w-4" />
+                    ) : (
+                      <Moon className="h-4 w-4" />
+                    )}
+                    <span className="text-sm font-medium">
+                      {darkMode ? 'Light Mode' : 'Dark Mode'}
+                    </span>
+                  </button>
+                  
+                  <button 
+                    onClick={() => {
+                      logout();
+                      setShowSettingsMenu(false);
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-b-lg transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="text-sm font-medium">Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (

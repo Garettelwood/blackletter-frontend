@@ -51,6 +51,27 @@ export interface User {
   name?: string;
 }
 
+// Authentication types
+export interface AuthUser {
+  id: string;
+  username: string;
+  email: string;
+  createdAt: string;
+  password?: string; // Optional for internal use, removed when stored in context
+}
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+export interface RegisterCredentials {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 export interface Project {
   id: string;
   name: string;
